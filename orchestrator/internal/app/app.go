@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 	"unicode"
+	"os"
+	"log"
 
 	"dac/orchestrator/models"
 )
@@ -68,15 +70,28 @@ func waitForResult(task models.Task) float64 {
 func getOperationTime(op string) int {
 	switch op {
 	case "+":
-		return 5000
+		return getEnvAsInt("TIME_ADDITION_MS", 1000)
 	case "-":
-		return 5000
+		return getEnvAsInt("TIME_SUBTRACTION_MS", 1000)
 	case "*":
-		return 7000
+		return getEnvAsInt("TIME_MULTIPLICATIONS_MS", 2000)
 	case "/":
-		return 10000
+		return getEnvAsInt("TIME_DIVISIONS_MS", 2000)
 	}
 	return 0
+}
+
+func getEnvAsInt(name string, defaultValue int) int {
+    valueStr := os.Getenv(name)
+    if valueStr == "" {
+        return defaultValue
+    }
+    value, err := strconv.Atoi(valueStr)
+    if err != nil {
+        log.Printf("Invalid value for %s: %s. Using default: %d\n", name, valueStr, defaultValue)
+        return defaultValue
+    }
+    return value
 }
 
 // tokenize разбивает строку выражения на токены (числа и операторы).

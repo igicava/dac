@@ -3,14 +3,18 @@ package main
 import (
 	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 	"time"
 
 	"dac/agent/internal/app"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	LoadEnv()
 	computingPower, err := strconv.Atoi(os.Getenv("COMPUTING_POWER"))
 	if err != nil {
 		log.Fatalf("Invalid COMPUTING_POWER: %v", err)
@@ -36,4 +40,12 @@ func main() {
 		}()
 	}
 	wg.Wait()
+}
+
+func LoadEnv() {
+	envPath := filepath.Join("..", ".env")
+	err := godotenv.Load(envPath)
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
 }
