@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+// Структура таска
 type Task struct {
     ID            string  `json:"id"`
     Arg1          float64 `json:"arg1"`
@@ -16,6 +17,7 @@ type Task struct {
     OperationTime int     `json:"operation_time"`
 }
 
+// Этот бро получает выражения
 func GetTask() *Task {
 	resp, err := http.Get("http://localhost:8080/internal/task")
 	if err != nil {
@@ -36,6 +38,7 @@ func GetTask() *Task {
 	return &result.Task
 }
 
+// Этот бро считает выражения
 func ComputeTask(task Task) float64 {
 	time.Sleep(time.Duration(task.OperationTime) * time.Millisecond)
 	switch task.Operation {
@@ -56,6 +59,7 @@ func ComputeTask(task Task) float64 {
 	return 0
 }
 
+// А этот бро отправляет результат оркестратору
 func SendResult(id string, result float64) {
 	taskResult := struct {
 		ID     string  `json:"id"`

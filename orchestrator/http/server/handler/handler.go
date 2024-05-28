@@ -8,6 +8,7 @@ import (
     "dac/orchestrator/internal/app"
 )
 
+// AddExpression добавляет выражение
 func AddExpression(w http.ResponseWriter, r *http.Request) {
     var expr models.Expression
     if err := json.NewDecoder(r.Body).Decode(&expr); err != nil {
@@ -26,6 +27,7 @@ func AddExpression(w http.ResponseWriter, r *http.Request) {
     w.WriteHeader(http.StatusCreated)
 }
 
+// GetExpressions возвращает все выражения
 func GetExpressions(w http.ResponseWriter, r *http.Request) {
     models.Mu.Lock()
     defer models.Mu.Unlock()
@@ -39,6 +41,7 @@ func GetExpressions(w http.ResponseWriter, r *http.Request) {
     })
 }
 
+// GetExpressionByID возвращает выражение по его идентификатору
 func GetExpressionByID(w http.ResponseWriter, r *http.Request) {
     id := r.PathValue("id")
 
@@ -55,6 +58,7 @@ func GetExpressionByID(w http.ResponseWriter, r *http.Request) {
     })
 }
 
+// Функция для обработки запросов от агентов (раздаёт им задачи для решения или принимает результат от агента)
 func AgentTask(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		select {

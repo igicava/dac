@@ -11,12 +11,21 @@ import (
 	"dac/orchestrator/models"
 )
 
+// ProcessExpression:
+// Токенизирует выражение и преобразует его в постфиксную нотацию.
+// Передает постфиксное выражение в computePostfix для вычисления.
 func ProcessExpression(expr models.Expression) {
 	tokens := tokenize(expr.Expression)
 	postfix := infixToPostfix(tokens)
 	computePostfix(postfix, expr.ID)
 }
 
+// computePostfix:
+// Проходит по каждому токену постфиксного выражения.
+// Если токен является числом, помещает его в стек.
+// Если токен является оператором, извлекает два числа из стека, создает задачу и отправляет ее в канал задач.
+// Ожидает результат выполнения задачи агентом и помещает его обратно в стек.
+// В конце обновляет результат и статус выражения в модели.
 func computePostfix(tokens []string, exprID string) {
 	var stack []float64
 	for _, token := range tokens {
@@ -52,6 +61,9 @@ func computePostfix(tokens []string, exprID string) {
 	}
 }
 
+// waitForResult:
+// Имитирует длительное выполнение задачи с помощью time.Sleep.
+// Выполняет операцию на основе оператора и возвращает результат.
 func waitForResult(task models.Task) float64 {
 	time.Sleep(time.Duration(task.OperationTime) * time.Millisecond)
 	switch task.Operation {
@@ -67,6 +79,7 @@ func waitForResult(task models.Task) float64 {
 	return math.NaN()
 }
 
+// getOperationTime возвращает время выполнения для каждой операции
 func getOperationTime(op string) int {
 	switch op {
 	case "+":
@@ -81,6 +94,7 @@ func getOperationTime(op string) int {
 	return 0
 }
 
+// getEnvAsInt возвращает значение переменной среды или значение по умолчанию
 func getEnvAsInt(name string, defaultValue int) int {
     valueStr := os.Getenv(name)
     if valueStr == "" {

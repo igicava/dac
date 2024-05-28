@@ -21,7 +21,8 @@ func main() {
 	}
 
 	var wg sync.WaitGroup
-
+	
+	// Запуск горутин
 	for i := 0; i < computingPower; i++ {
 		wg.Add(1)
 		go func() {
@@ -42,6 +43,7 @@ func main() {
 	wg.Wait()
 }
 
+// Загрузка переменных среды. Для предотвращения ошибок на этом этапе запускайте проект так как написано в README
 func LoadEnv() {
 	envPath := filepath.Join("..", ".env")
 	err := godotenv.Load(envPath)
