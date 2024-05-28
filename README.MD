@@ -119,10 +119,18 @@ curl --location 'localhost:8080/api/v1/calculate' \
 ```sh
 curl --location 'localhost:8080/api/v1/expressions'
 ```
+Вывод:
+```json
+{"expressions":[{"id":"1","expression":"2 + 2 * 2","status":"completed","result":6}]}
+```
 
 3. Получение выражения по его идентификатору
 ```sh
 curl --location 'localhost:8080/api/v1/expressions/1'
+```
+Вывод:
+```json
+{"expression":{"id":"1","expression":"2 + 2 * 2","status":"completed","result":6}}
 ```
 
 ## Возможные ошибки:
