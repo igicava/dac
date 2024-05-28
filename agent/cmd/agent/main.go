@@ -17,7 +17,8 @@ func main() {
 	LoadEnv()
 	computingPower, err := strconv.Atoi(os.Getenv("COMPUTING_POWER"))
 	if err != nil {
-		log.Fatalf("Invalid COMPUTING_POWER: %v", err)
+		log.Printf("Invalid COMPUTING_POWER: %v", err)
+		computingPower = 4
 	}
 
 	var wg sync.WaitGroup
@@ -48,6 +49,6 @@ func LoadEnv() {
 	envPath := filepath.Join(".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Printf("Error loading .env file: %v", err)
 	}
 }

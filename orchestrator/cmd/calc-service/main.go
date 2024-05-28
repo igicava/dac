@@ -20,6 +20,6 @@ func LoadEnv() {
 	envPath := filepath.Join(".env")
 	err := godotenv.Load(envPath)
 	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
+		log.Printf("Error loading .env file: %v", err)
 	}
 }
