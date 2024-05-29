@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -23,6 +24,7 @@ func main() {
 
 	var wg sync.WaitGroup
 
+	fmt.Println("Agents is runing")
 	// Запуск горутин
 	for i := 0; i < computingPower; i++ {
 		wg.Add(1)

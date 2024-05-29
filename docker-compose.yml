@@ -1,0 +1,23 @@
+version: '3'
+services:
+  orchestrator:
+    build: 
+      context: .
+      dockerfile: ./orchestrator/Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - my-network
+
+  agent:
+    build: 
+      context: .
+      dockerfile: ./agent/Dockerfile
+    depends_on:
+      - orchestrator
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

@@ -21,6 +21,7 @@ type Task struct {
 func GetTask() *Task {
 	resp, err := http.Get("http://localhost:8080/internal/task")
 	if err != nil {
+		log.Printf("Error: %s", err)
 		return nil
 	}
 	defer resp.Body.Close()
