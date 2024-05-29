@@ -10,16 +10,16 @@ import (
 
 // Структура таска
 type Task struct {
-    ID            string  `json:"id"`
-    Arg1          float64 `json:"arg1"`
-    Arg2          float64 `json:"arg2"`
-    Operation     string  `json:"operation"`
-    OperationTime int     `json:"operation_time"`
+	ID            string  `json:"id"`
+	Arg1          float64 `json:"arg1"`
+	Arg2          float64 `json:"arg2"`
+	Operation     string  `json:"operation"`
+	OperationTime int     `json:"operation_time"`
 }
 
 // Этот бро получает выражения
 func GetTask() *Task {
-	resp, err := http.Get("http://localhost:8080/internal/task")
+	resp, err := http.Get("http://orchestrator:8080/internal/task")
 	if err != nil {
 		log.Printf("Error: %s", err)
 		return nil
@@ -76,7 +76,7 @@ func SendResult(id string, result float64) {
 		return
 	}
 
-	resp, err := http.Post("http://localhost:8080/internal/task", "application/json", bytes.NewBuffer(jsonData))
+	resp, err := http.Post("http://orchestrator:8080/internal/task", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Println("Error sending result:", err)
 		return
