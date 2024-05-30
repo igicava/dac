@@ -21,8 +21,10 @@ type Task struct {
 func GetTask() *Task {
 	resp, err := http.Get("http://orchestrator:8080/internal/task")
 	if err != nil {
-		log.Printf("Error: %s", err)
-		return nil
+		resp, err = http.Get("http://localhost:8080/internal/task")
+		if err != nil {
+			return nil
+		}
 	}
 	defer resp.Body.Close()
 
@@ -78,8 +80,10 @@ func SendResult(id string, result float64) {
 
 	resp, err := http.Post("http://orchestrator:8080/internal/task", "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
-		log.Println("Error sending result:", err)
-		return
+		resp, err = http.Post("http://localhost:8080/internal/task", "application/json", bytes.NewBuffer(jsonData))
+		if err != nil {
+			return
+		}
 	}
 	defer resp.Body.Close()
 
