@@ -109,12 +109,13 @@ curl --location 'localhost:8080/api/v1/expressions'
 curl --location 'localhost:8080/api/v1/expressions/<id выражения>'
 ```
 
-4. Получение задачи для выполнения (для агента)
+### Агент
+1. Получение задачи для выполнения (для агента)
 ```sh
 curl --location 'localhost:8080/internal/task'
 ```
 
-5. Прием результата обработки данных (от агента)
+2. Прием результата обработки данных (от агента)
 ```sh
 curl --location 'localhost:8080/internal/task' \
 --header 'Content-Type: application/json' \
