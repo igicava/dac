@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-var Expressions = make(map[string]Expression) // Мапа выражений
+var Expressions = make(map[string]Expression) // Мапа c выражениями
 var Tasks = make(chan Task) // Канал с тасками
 var Mu sync.Mutex // Мьютекс
 
