@@ -88,7 +88,6 @@ func AgentTask(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		expr.Result = taskResult.Result
-		expr.Status = "completed"
 		models.Expressions[taskResult.ID] = expr
 	
 		w.WriteHeader(http.StatusOK)
