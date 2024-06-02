@@ -72,17 +72,7 @@ go run agent/cmd/agent/main.go
 ## Запуск с помощью docker compose
 **Вообще docker hub не давно заблокировали в России поэтому перед запуском включите VPN или используйте другое зеркало.**
 
-1. Для запуска с помощью docker compose клонируйте репозиторий:
-```sh
-git clone https://github.com/igicava/dac.git
-```
-
-2. Потом перейдите в проект:
-```sh
-cd dac
-```
-
-3. И запустите с помощью docker compose:
+Запустите с помощью docker compose:
 ```sh
 docker compose up
 ```

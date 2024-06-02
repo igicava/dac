@@ -1,6 +1,8 @@
 package app
 
 import (
+	"time"
+	"math"
 	"strconv"
 	"unicode"
 	"os"
@@ -61,22 +63,18 @@ func computePostfix(tokens []string, exprID string) {
 
 // Ждёт результат от агента и возвращает результат.
 func waitForResult(task models.Task) float64 {
-    resultChan := make(chan float64)
-
-    // Создаем горутину, которая ждет результат от агента
-    go func() {
-        for {
-            models.Mu.Lock()
-            expr, ok := models.Expressions[task.ID]
-            models.Mu.Unlock()
-            if ok && expr.Status == "completed" {
-                resultChan <- expr.Result
-                return
-            }
-        }
-    }()
-    
-    return <-resultChan
+	time.Sleep(time.Duration(task.OperationTime) * time.Millisecond)
+	switch task.Operation {
+	case "+":
+		return task.Arg1 + task.Arg2
+	case "-":
+		return task.Arg1 - task.Arg2
+	case "*":
+		return task.Arg1 * task.Arg2
+	case "/":
+		return task.Arg1 / task.Arg2
+	}
+	return math.NaN()
 }
 
 

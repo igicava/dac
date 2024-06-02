@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"sync"
-	"time"
+	
 
 	"dac/agent/internal/app"
 
@@ -37,9 +37,7 @@ func main() {
 					result := app.ComputeTask(*task)
 					log.Printf("Computed result for task %s: %f", task.ID, result)
 					app.SendResult(task.ID, result)
-				} else {
-					time.Sleep(3 * time.Second) // Интервал ожидания для предотвращения частого опроса
-				}
+				} 
 			}
 		}()
 	}
