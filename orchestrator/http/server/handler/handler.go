@@ -78,6 +78,8 @@ func AgentTask(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 			return
 		}
+
+        models.Results <- taskResult
 	
 		models.Mu.Lock()
 		defer models.Mu.Unlock()

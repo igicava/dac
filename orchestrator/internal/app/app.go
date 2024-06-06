@@ -1,12 +1,11 @@
 package app
 
 import (
-	"time"
-	"math"
-	"strconv"
-	"unicode"
-	"os"
 	"log"
+	"os"
+	"strconv"
+	"time"
+	"unicode"
 
 	"dac/orchestrator/models"
 )
@@ -29,8 +28,7 @@ func ProcessExpression(expr models.Expression) {
 func computePostfix(tokens []string, exprID string) {
 	var stack []float64
 	for _, token := range tokens {
-		if _, err := strconv.ParseFloat(token, 64); err == nil {
-			num, _ := strconv.ParseFloat(token, 64)
+		if num, err := strconv.ParseFloat(token, 64); err == nil {
 			stack = append(stack, num)
 		} else {
 			if len(stack) < 2 {
@@ -47,43 +45,22 @@ func computePostfix(tokens []string, exprID string) {
 				OperationTime: opTime,
 			}
 			models.Tasks <- task
-			result := waitForResult(task)
-			stack = append(stack, result)
+			time.Sleep(time.Duration(task.OperationTime) * time.Millisecond)
+			out := <-models.Results
+			if out.ID == task.ID {
+				stack = append(stack, out.Result)
+			}
 		}
 	}
+
 	if len(stack) == 1 {
 		models.Mu.Lock()
+		defer models.Mu.Unlock()
 		expr := models.Expressions[exprID]
 		expr.Result = stack[0]
 		expr.Status = "completed"
 		models.Expressions[exprID] = expr
-		models.Mu.Unlock()
 	}
-}
-
-/*
-	Почему waitForResult важная функция?
-
-	Если убрать waitForResult, оркестратор не сможет дождаться выполнения задачи агентом 
-	перед продолжением обработки следующего оператора. 
-	Следовательно, цепочка вычислений прервется на первой задаче, что приводит к некорректному результату.
-
-	Но это не мешает агенту корректно выполнять задачи и отдавать их результат обратно и также без агента
-	оркестратор работать не будет
-*/
-func waitForResult(task models.Task) float64 {
-	time.Sleep(time.Duration(task.OperationTime) * time.Millisecond)
-	switch task.Operation {
-	case "+":
-		return task.Arg1 + task.Arg2
-	case "-":
-		return task.Arg1 - task.Arg2
-	case "*":
-		return task.Arg1 * task.Arg2
-	case "/":
-		return task.Arg1 / task.Arg2
-	}
-	return math.NaN()
 }
 
 
