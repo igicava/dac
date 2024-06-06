@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"time"
 	"unicode"
 
 	"dac/orchestrator/models"
@@ -45,7 +44,6 @@ func computePostfix(tokens []string, exprID string) {
 				OperationTime: opTime,
 			}
 			models.Tasks <- task
-			time.Sleep(time.Duration(task.OperationTime) * time.Millisecond)
 			out := <-models.Results
 			if out.ID == task.ID {
 				stack = append(stack, out.Result)
