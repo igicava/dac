@@ -26,6 +26,7 @@ func ProcessExpression(expr models.Expression) {
 // В конце обновляет результат и статус выражения в модели.
 func computePostfix(tokens []string, exprID string) {
 	var stack []float64
+	models.NewChan(exprID)
 	for _, token := range tokens {
 		if num, err := strconv.ParseFloat(token, 64); err == nil {
 			stack = append(stack, num)
@@ -44,11 +45,9 @@ func computePostfix(tokens []string, exprID string) {
 				OperationTime: opTime,
 			}
 			models.Tasks <- task
-			out := <-models.Results
-			if out.ID == task.ID {
-				stack = append(stack, out.Result)
+			out := <-models.Results[task.ID]
+			stack = append(stack, out.Result)
 			}
-		}
 	}
 
 	if len(stack) == 1 {

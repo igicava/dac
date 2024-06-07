@@ -6,8 +6,14 @@ import (
 
 var Expressions = make(map[string]Expression) // Мапа c выражениями
 var Tasks = make(chan Task) // Канал с тасками
-var Results = make(chan Result) // Канал с результатами
+var Results = make(map[string]chan Result) // Канал с результатами
 var Mu sync.Mutex // Мьютекс
+
+func NewChan(id string) {
+    Mu.Lock()
+    Results[id] = make(chan Result)
+    Mu.Unlock()
+}
 
 // Структура самого выражения
 type Expression struct {

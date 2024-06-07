@@ -79,7 +79,7 @@ func AgentTask(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-        models.Results <- taskResult
+        models.Results[taskResult.ID] <- taskResult
 	
 		models.Mu.Lock()
 		defer models.Mu.Unlock()
@@ -96,3 +96,4 @@ func AgentTask(w http.ResponseWriter, r *http.Request) {
 	}
     
 }
+
