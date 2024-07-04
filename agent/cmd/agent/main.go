@@ -37,7 +37,7 @@ func main() {
 					result := app.ComputeTask(*task)
 					log.Printf("Computed result for task %s: %f", task.ID, result)
 					app.SendResult(task.ID, result)
-					time.Sleep(1 * time.Second)
+					time.Sleep(2 * time.Second)
 				} 
 			}
 		}()

@@ -1,0 +1,24 @@
+syntax = "proto3"; // версия proto файлов
+package calculator; // название пакета
+option go_package = "dac/proto";
+
+// Сообщение, описывающее отправку выражения
+message POSTRequest {
+    bytes jsonTASK = 1; // числа здесь - порядок полей в сообщении
+}
+
+// Сообщение, описывающее получение выражения
+message GETRequest {}
+
+message GETResponse {
+    bytes result = 1;
+}
+
+message POSTResponse {}
+
+// Определение сервиса с двумя методами
+service CalcService {
+	// методы, которые можно будет реализовать и использовать 
+    rpc GETtask (GETRequest) returns (GETResponse); 
+    rpc POSTtask (POSTRequest) returns (POSTResponse);
+}

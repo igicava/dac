@@ -1,11 +1,17 @@
 package app
 
 import (
-	"bytes"
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
-	"net/http"
+	"os"
 	"time"
+
+	pb "dac/proto"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Структура таска
@@ -19,24 +25,34 @@ type Task struct {
 
 // Этот бро получает выражения
 func GetTask() *Task {
-	resp, err := http.Get("http://orchestrator:8080/internal/task")
-	if err != nil {
-		resp, err = http.Get("http://localhost:8080/internal/task")
-		if err != nil {
-			return nil
-		}
-	}
-	defer resp.Body.Close()
+	host := "localhost"
+	port := "8081"
 
-	if resp.StatusCode != http.StatusOK {
+	addr := fmt.Sprintf("%s:%s", host, port) // используем адрес сервера
+	// установим соединение
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	if err != nil {
+		log.Println("could not connect to grpc server: ", err)
+		os.Exit(1)
+	}
+	// закроем соединение, когда выйдем из функции
+	defer conn.Close()
+	grpcClient := pb.NewCalcServiceClient(conn)
+	task, err := grpcClient.GETtask(context.TODO(), &pb.GETRequest{})
+
+	if err != nil {
+		log.Println("failed get task: ", err)
 		return nil
 	}
 
 	var result struct {
 		Task Task `json:"task"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return nil
+
+	err = json.Unmarshal([]byte(task.Result), &result.Task)
+	if err != nil {
+		log.Println("Error Unmarshal task on agent")
 	}
 	return &result.Task
 }
@@ -78,16 +94,24 @@ func SendResult(id string, result float64) {
 		return
 	}
 
-	resp, err := http.Post("http://orchestrator:8080/internal/task", "application/json", bytes.NewBuffer(jsonData))
-	if err != nil {
-		resp, err = http.Post("http://localhost:8080/internal/task", "application/json", bytes.NewBuffer(jsonData))
-		if err != nil {
-			return
-		}
-	}
-	defer resp.Body.Close()
+	host := "localhost"
+	port := "8081"
 
-	if resp.StatusCode != http.StatusOK {
-		log.Println("Error from server:", resp.Status)
+	addr := fmt.Sprintf("%s:%s", host, port) // используем адрес сервера
+	// установим соединение
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	if err != nil {
+		log.Println("could not connect to grpc server: ", err)
+		os.Exit(1)
 	}
+	// закроем соединение, когда выйдем из функции
+	defer conn.Close()
+	grpcClient := pb.NewCalcServiceClient(conn)
+	_, err = grpcClient.POSTtask(context.TODO(), &pb.POSTRequest{JsonTASK: jsonData})
+
+	if err != nil {
+		log.Println("failed post task: ", err)
+	}
+
 }

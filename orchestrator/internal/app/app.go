@@ -47,7 +47,7 @@ func computePostfix(tokens []string, exprID string) {
 			models.Tasks <- task
 			out := <-models.Results[task.ID]
 			stack = append(stack, out.Result)
-			}
+		}
 	}
 
 	if len(stack) == 1 {
