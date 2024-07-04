@@ -35,7 +35,7 @@ func main() {
 	// создадим сервер grpc
 	grpcServer := grpc.NewServer()
 	// объект структуры, которая содержит реализацию
-	// серверной части GeometryService
+	// серверной части CalcService
 	calcServiceServer := grpc_server.NewServer()
 	// зарегистрируем нашу реализацию сервера
 	pb.RegisterCalcServiceServer(grpcServer, calcServiceServer)
