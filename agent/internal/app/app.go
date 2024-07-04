@@ -25,25 +25,19 @@ type Task struct {
 
 // Этот бро получает выражения
 func GetTask() *Task {
-	host := "localhost"
+	host := os.Getenv("HOST")
 	port := "8081"
 
 	addr := fmt.Sprintf("%s:%s", host, port) // используем адрес сервера
 	// установим соединение
-	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-
-	if err != nil {
-		log.Println("could not connect to grpc server: ", err)
-		os.Exit(1)
-	}
+	conn, _ := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// закроем соединение, когда выйдем из функции
 	defer conn.Close()
 	grpcClient := pb.NewCalcServiceClient(conn)
 	task, err := grpcClient.GETtask(context.TODO(), &pb.GETRequest{})
 
 	if err != nil {
-		log.Println("failed get task: ", err)
-		return nil
+		log.Println("ERROR CONNECT")
 	}
 
 	var result struct {
@@ -94,24 +88,19 @@ func SendResult(id string, result float64) {
 		return
 	}
 
-	host := "localhost"
+	host := os.Getenv("HOST")
 	port := "8081"
 
 	addr := fmt.Sprintf("%s:%s", host, port) // используем адрес сервера
 	// установим соединение
-	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-
-	if err != nil {
-		log.Println("could not connect to grpc server: ", err)
-		os.Exit(1)
-	}
+	conn, _ := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// закроем соединение, когда выйдем из функции
 	defer conn.Close()
 	grpcClient := pb.NewCalcServiceClient(conn)
 	_, err = grpcClient.POSTtask(context.TODO(), &pb.POSTRequest{JsonTASK: jsonData})
 
 	if err != nil {
-		log.Println("failed post task: ", err)
+		log.Println("ERROR CONNECT")
 	}
 
 }

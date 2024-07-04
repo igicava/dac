@@ -20,7 +20,7 @@ func main() {
 	fmt.Println("Server is start on port 8080")
 	go server.Run()
 	fmt.Println("gRPC server runing...")
-	host := "localhost"
+	host := "0.0.0.0"
 	port := "8081"
 
 	addr := fmt.Sprintf("%s:%s", host, port)

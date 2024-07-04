@@ -72,7 +72,13 @@ go run agent/cmd/agent/main.go
 ## Запуск с помощью docker compose
 **Вообще docker hub не давно заблокировали в России поэтому перед запуском включите VPN или используйте другое зеркало.**
 
-Запустите с помощью docker compose:
+Чтобы проект работал в docker compose перейдите в файл ".env" в корне проекта, и в переменной среды HOST измените значение на orchestrator (по умолчанию localhost). Должно быть так: 
+
+```env
+HOST=orchestrator
+```
+
+И потом запустите с помощью docker compose:
 ```sh
 docker compose up
 ```

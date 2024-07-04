@@ -5,6 +5,7 @@ services:
       dockerfile: ./orchestrator/Dockerfile
     ports:
       - "8080:8080"
+      - "8081:8081"
     networks:
       - my-network
 
@@ -19,3 +20,4 @@ services:
 
 networks:
   my-network:
+    driver: bridge
