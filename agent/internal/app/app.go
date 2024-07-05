@@ -3,9 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
-	"os"
 	"time"
 
 	pb "dac/proto"
@@ -25,12 +23,8 @@ type Task struct {
 
 // Этот бро получает выражения
 func GetTask() *Task {
-	host := os.Getenv("HOST")
-	port := "8081"
-
-	addr := fmt.Sprintf("%s:%s", host, port) // используем адрес сервера
 	// установим соединение
-	conn, _ := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, _ := grpc.Dial("orchestrator:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// закроем соединение, когда выйдем из функции
 	defer conn.Close()
 	grpcClient := pb.NewCalcServiceClient(conn)
@@ -87,13 +81,8 @@ func SendResult(id string, result float64) {
 		log.Println("Error marshalling result:", err)
 		return
 	}
-
-	host := os.Getenv("HOST")
-	port := "8081"
-
-	addr := fmt.Sprintf("%s:%s", host, port) // используем адрес сервера
 	// установим соединение
-	conn, _ := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, _ := grpc.Dial("orchestrator:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// закроем соединение, когда выйдем из функции
 	defer conn.Close()
 	grpcClient := pb.NewCalcServiceClient(conn)
