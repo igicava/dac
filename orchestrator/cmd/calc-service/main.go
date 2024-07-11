@@ -1,15 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net"
 	"os"
 	"path/filepath"
 
-	"dac/orchestrator/http/server"
-	pb "dac/proto"
 	grpc_server "dac/orchestrator/grpc/server"
+	"dac/orchestrator/http/server"
+	"dac/orchestrator/models"
+	pb "dac/proto"
 
 	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
@@ -17,8 +19,16 @@ import (
 
 func main() {
 	LoadEnv()
+
 	fmt.Println("Server is start on port 8080")
 	go server.Run()
+
+	go func () {
+		models.OpenDB()
+		models.СreateTables(context.Background())
+		fmt.Println("DB is start")
+	}()
+
 	fmt.Println("gRPC server runing...")
 	host := "0.0.0.0"
 	port := "8081"

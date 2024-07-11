@@ -49,14 +49,18 @@ func computePostfix(tokens []string, exprID string) {
 			stack = append(stack, out.Result)
 		}
 	}
-
+	// ошибки :(
 	if len(stack) == 1 {
 		models.Mu.Lock()
 		defer models.Mu.Unlock()
-		expr := models.Expressions[exprID]
-		expr.Result = stack[0]
-		expr.Status = "completed"
-		models.Expressions[exprID] = expr
+		err := models.UpdateResult(exprID, stack[0])
+		if err != nil {
+			log.Printf("In app.go 58 : %s", err)
+		}
+		err = models.UpdateStatus(exprID)
+		if err != nil {
+			log.Printf("In app.go 62: %s", err)
+		}
 	}
 }
 

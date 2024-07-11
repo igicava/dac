@@ -44,12 +44,10 @@ func (s *Server) POSTtask(ctx context.Context, in *pb.POSTRequest) (*pb.POSTResp
 	models.Mu.Lock()
 	defer models.Mu.Unlock()
 
-	expr, ok := models.Expressions[taskResult.ID]
-	if !ok {
-		log.Println("Task not found")
+	err = models.UpdateResult(taskResult.ID, taskResult.Result)
+	if err != nil {
+		log.Printf("Error grpc POSTtask 49 : %s", err)
 	}
-	expr.Result = taskResult.Result
-	models.Expressions[taskResult.ID] = expr
 
 	return &pb.POSTResponse{}, nil
 }
