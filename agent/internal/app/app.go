@@ -25,7 +25,7 @@ type Task struct {
 // Этот бро получает выражения
 func GetTask() *Task {
 	// установим соединение
-	conn, _ := grpc.Dial("localhost:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, _ := grpc.Dial("orchestrator:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// закроем соединение, когда выйдем из функции
 	defer conn.Close()
 	grpcClient := pb.NewCalcServiceClient(conn)
@@ -83,7 +83,7 @@ func SendResult(id string, result float64) {
 		return
 	}
 	// установим соединение
-	conn, _ := grpc.Dial("localhost:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, _ := grpc.Dial("orchestrator:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// закроем соединение, когда выйдем из функции
 	defer conn.Close()
 	grpcClient := pb.NewCalcServiceClient(conn)
