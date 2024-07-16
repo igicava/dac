@@ -19,7 +19,6 @@ type Task struct {
 	Arg2          float64 `json:"arg2"`
 	Operation     string  `json:"operation"`
 	OperationTime int     `json:"operation_time"`
-	User          string  `json:"user"`
 }
 
 // Этот бро получает выражения

@@ -19,7 +19,7 @@ func AddExpression(w http.ResponseWriter, r *http.Request) {
     }
     _, ok := models.Results[expr.ID]
     if ok {
-        w.Write([]byte("Your ID is already occupied by another user. Come up with another one or wait for it to be released\n"))
+        w.Write([]byte("Your id is already occupied by another user. Come up with another one or wait for it to be released\n"))
         return
     }
     expr.Status = "pending"
@@ -30,14 +30,14 @@ func AddExpression(w http.ResponseWriter, r *http.Request) {
         log.Println(err)
         return
     }
-    err = models.Add(expr.ID, expr, name)
+    err = models.Add(expr.ID, expr, name, expr.Token)
     if err != nil {
         w.WriteHeader(http.StatusInternalServerError)
     }
 
     models.Mu.Unlock()
 
-    go app.ProcessExpression(expr, name)
+    go app.ProcessExpression(expr)
 
     w.WriteHeader(http.StatusCreated)
 }
@@ -102,6 +102,10 @@ func RegisterNewUser(w http.ResponseWriter, r *http.Request) {
     var user models.UserModel
     if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
         log.Printf("Error in handler.go : %s", err)
+    }
+    if U, _ := models.SelectUserByName(context.TODO(), models.DB, user.Name); U.Name != "" {
+        w.WriteHeader(http.StatusUnauthorized)
+        return
     }
     var q = `
 	INSERT INTO users (name, password) values ($1, $2)

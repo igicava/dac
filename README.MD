@@ -54,51 +54,113 @@ docker compose up
 
 ## API
 
-1. Добавление вычисления арифметического выражения
+1. Регистрация пользователя
+```sh
+curl --location 'localhost:8080/api/v1/register' \
+--header 'Content-Type: application/json' \
+--data '{
+      "name": "<имя пользователя>",
+      "password": "<пароль>"
+}'
+```
+
+2. Авторизация пользователя и выдыча JWT токена для взаимодействия с проектом
+```sh
+curl --location 'localhost:8080/api/v1/login' \
+--header 'Content-Type: application/json' \
+--data '{
+      "name": "<имя пользователя>",
+      "password": "<пароль>"
+}'
+```
+
+3. Добавление вычисления арифметического выражения
 ```sh
 curl --location 'localhost:8080/api/v1/calculate' \
 --header 'Content-Type: application/json' \
 --data '{
       "id": "<уникальный идентификатор выражения>",
-      "expression": "<строка с выражением>"
+      "expression": "<строка с выражением>", 
+      "token": "<токен который был выдан при авторизации>"
 }'
 ```
 
-2. Получение списка выражений
+4. Получение списка выражений которые отправляли вы
 ```sh
-curl --location 'localhost:8080/api/v1/expressions'
+curl --location 'localhost:8080/api/v1/expressions' \
+--header 'Content-Type: application/json' \
+--data '{
+      "token": "<токен который был выдан при авторизации>"
+}'
 ```
 
-3. Получение выражения по его идентификатору
+5. Получение вышего выражения по его идентификатору
 ```sh
-curl --location 'localhost:8080/api/v1/expressions/<id выражения>'
+curl --location 'localhost:8080/api/v1/expressions/<id выражения>' \
+--header 'Content-Type: application/json' \
+--data '{
+      "token": "<токен который был выдан при авторизации>"
+}'
 ```
 
 ## Примеры использования 
-1. Добавление вычисления арифметического выражения
+1. Зарегестрируйтесь
+```sh
+curl --location 'localhost:8080/api/v1/register' \
+--header 'Content-Type: application/json' \
+--data '{
+      "name": "user",
+      "password": "1234"
+}'
+```
+
+2. Авторизуйтесь и получите токен
+```sh
+curl --location 'localhost:8080/api/v1/login' \
+--header 'Content-Type: application/json' \
+--data '{
+      "name": "user",
+      "password": "1234"
+}'
+```
+Вывод:
+```json
+{"token":"<тут будет ваш токен>"}
+```
+
+3. Добавьте выражение на вычисление.
 ```sh
 curl --location 'localhost:8080/api/v1/calculate' \
 --header 'Content-Type: application/json' \
 --data '{
       "id": "1",
-      "expression": "2 + 2 * 2"
+      "expression": "2 + 2 * 2",
+      "token": "<тут будет ваш токен>"
 }'
 ```
 
-2. Получение списка выражений
+4. Получение списка ваших выражений
 ```sh
-curl --location 'localhost:8080/api/v1/expressions'
+curl --location 'localhost:8080/api/v1/expressions' \
+--header 'Content-Type: application/json' \
+--data '{
+      "token": "<токен который был выдан при авторизации>"
+}'
 ```
 Вывод:
 ```json
 {"expressions":[{"id":"1","expression":"2 + 2 * 2","status":"completed","result":6}]}
 ```
 
-3. Получение выражения по его идентификатору
+5. Получение выражения по его идентификатору
 ```sh
-curl --location 'localhost:8080/api/v1/expressions/1'
+curl --location 'localhost:8080/api/v1/expressions/1' \
+--header 'Content-Type: application/json' \
+--data '{
+      "token": "<токен который был выдан при авторизации>"
+}'
 ```
 Вывод:
 ```json
-{"expression":{"id":"1","expression":"2 + 2 * 2","status":"completed","result":6}}
+{"expression":{"id":"1","expression":"2 + 2 * 2","status":"completed","result":"6"}}
 ```

@@ -12,10 +12,10 @@ import (
 // ProcessExpression:
 // Токенизирует выражение и преобразует его в постфиксную нотацию.
 // Передает постфиксное выражение в computePostfix для вычисления.
-func ProcessExpression(expr models.Expression, user_name string) {
+func ProcessExpression(expr models.Expression) {
 	tokens := tokenize(expr.Expression)
 	postfix := infixToPostfix(tokens)
-	computePostfix(postfix, expr.ID, user_name)
+	computePostfix(postfix, expr.ID)
 }
 
 // computePostfix:
@@ -24,9 +24,9 @@ func ProcessExpression(expr models.Expression, user_name string) {
 // Если токен является оператором, извлекает два числа из стека, создает задачу и отправляет ее в канал задач.
 // Ожидает результат выполнения задачи агентом и помещает его обратно в стек.
 // В конце обновляет результат и статус выражения в модели.
-func computePostfix(tokens []string, exprID string, user_name string) {
+func computePostfix(tokens []string, exprID string) {
 	var stack []float64
-	models.NewChan(exprID, user_name)
+	models.NewChan(exprID)
 	for _, token := range tokens {
 		if num, err := strconv.ParseFloat(token, 64); err == nil {
 			stack = append(stack, num)
@@ -61,6 +61,7 @@ func computePostfix(tokens []string, exprID string, user_name string) {
 		if err != nil {
 			log.Printf("In app.go 62: %s", err)
 		}
+		delete(models.Results, exprID)
 	}
 }
 

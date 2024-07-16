@@ -34,9 +34,17 @@ type Task struct {
 	Arg2          float64 `json:"arg2"`
 	Operation     string  `json:"operation"`
 	OperationTime int     `json:"operation_time"`
-	User          string  `json:"user"`
 }
 
+// Для вывода
+type ExprOut struct {
+	ID         string  `json:"id"`
+	Expression string  `json:"expression"`
+	Status     string  `json:"status"`
+	Result     float64 `json:"result"`
+}
+
+// Модель выражения
 type ExpressionModel struct {
 	ID           int
 	ExpressionID string
@@ -46,6 +54,7 @@ type ExpressionModel struct {
 	Result       float64
 }
 
+// Модель пользователя
 type UserModel struct {
 	ID       int
 	Name     string
@@ -59,7 +68,7 @@ type Result struct {
 }
 
 // Новый канал для выражения
-func NewChan(id string, user_name string) {
+func NewChan(id string) {
 	Mu.Lock()
 	Results[id] = make(chan Result)
 	Mu.Unlock()
@@ -98,7 +107,8 @@ func СreateTables(ctx context.Context) error {
 		expression TEXT NOT NULL,
 		user_id INTEGER NOT NULL,
         status TEXT NOT NULL,
-        result REAL
+        result REAL, 
+		token TEXT
 	);`
 	)
 
@@ -114,15 +124,15 @@ func СreateTables(ctx context.Context) error {
 }
 
 // Добавление выражения
-func Add(expr_id string, expr Expression, user_name string) error {
+func Add(expr_id string, expr Expression, user_name string, token string) error {
 	var q = `
-	INSERT INTO expressions (expression_id, expression, user_id, status, result) values ($1, $2, $3, $4, $5)
+	INSERT INTO expressions (expression_id, expression, user_id, status, result, token) values ($1, $2, $3, $4, $5, $6)
 	`
 	tx, err := DB.BeginTx(context.TODO(), nil)
 	if err != nil {
 		return err
 	}
-	result, err := tx.ExecContext(context.TODO(), q, expr_id, expr.Expression, user_name, "pending", 0)
+	result, err := tx.ExecContext(context.TODO(), q, expr_id, expr.Expression, user_name, "pending", 0, token)
 	if err != nil {
 		return err
 	}
@@ -181,8 +191,8 @@ func UpdateStatus(id string) error {
 }
 
 // Выражение по ID
-func SelectExpressionByID(ctx context.Context, db *sql.DB, id string, user_name string) (Expression, error) {
-	u := Expression{}
+func SelectExpressionByID(ctx context.Context, db *sql.DB, id string, user_name string) (ExprOut, error) {
+	u := ExprOut{}
 	var q = "SELECT expression_id, expression, status, result FROM expressions WHERE expression_id = $1 AND user_id = $2"
 	err := db.QueryRowContext(ctx, q, id, user_name).Scan(&u.ID, &u.Expression, &u.Status, &u.Result)
 	if err != nil {
@@ -204,8 +214,8 @@ func SelectUserByName(ctx context.Context, db *sql.DB, name string) (UserModel, 
 }
 
 // Все выражения
-func SelectExpressions(ctx context.Context, db *sql.DB, user_name string) ([]Expression, error) {
-	var expressions []Expression
+func SelectExpressions(ctx context.Context, db *sql.DB, user_name string) ([]ExprOut, error) {
+	var expressions []ExprOut
 	var q = "SELECT expression_id, expression, status, result FROM expressions WHERE user_id = $1"
 
 	rows, err := db.QueryContext(ctx, q, user_name)
@@ -215,7 +225,7 @@ func SelectExpressions(ctx context.Context, db *sql.DB, user_name string) ([]Exp
 	defer rows.Close()
 
 	for rows.Next() {
-		e := Expression{}
+		e := ExprOut{}
 		err := rows.Scan(&e.ID, &e.Expression, &e.Status, &e.Result)
 		if err != nil {
 			return nil, err
