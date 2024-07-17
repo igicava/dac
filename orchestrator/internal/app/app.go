@@ -12,10 +12,10 @@ import (
 // ProcessExpression:
 // Токенизирует выражение и преобразует его в постфиксную нотацию.
 // Передает постфиксное выражение в computePostfix для вычисления.
-func ProcessExpression(expr models.Expression) {
+func ProcessExpression(expr models.Expression, name string) {
 	tokens := tokenize(expr.Expression)
 	postfix := infixToPostfix(tokens)
-	computePostfix(postfix, expr.ID)
+	computePostfix(postfix, expr.ID, name)
 }
 
 // computePostfix:
@@ -24,9 +24,9 @@ func ProcessExpression(expr models.Expression) {
 // Если токен является оператором, извлекает два числа из стека, создает задачу и отправляет ее в канал задач.
 // Ожидает результат выполнения задачи агентом и помещает его обратно в стек.
 // В конце обновляет результат и статус выражения в модели.
-func computePostfix(tokens []string, exprID string) {
+func computePostfix(tokens []string, exprID string, name string) {
 	var stack []float64
-	models.NewChan(exprID)
+	models.NewChan(exprID, name)
 	for _, token := range tokens {
 		if num, err := strconv.ParseFloat(token, 64); err == nil {
 			stack = append(stack, num)
@@ -43,9 +43,10 @@ func computePostfix(tokens []string, exprID string) {
 				Arg2:          b,
 				Operation:     token,
 				OperationTime: opTime,
+				Name:          name,
 			}
 			models.Tasks <- task
-			out := <-models.Results[task.ID]
+			out := <-models.Results[models.Key{Name: name, ID: exprID}]
 			stack = append(stack, out.Result)
 		}
 	}
@@ -61,10 +62,8 @@ func computePostfix(tokens []string, exprID string) {
 		if err != nil {
 			log.Printf("In app.go 62: %s", err)
 		}
-		delete(models.Results, exprID)
 	}
 }
-
 
 // getOperationTime возвращает время выполнения для каждой операции
 func getOperationTime(op string) int {
@@ -83,16 +82,16 @@ func getOperationTime(op string) int {
 
 // getEnvAsInt возвращает значение переменной среды или значение по умолчанию
 func getEnvAsInt(name string, defaultValue int) int {
-    valueStr := os.Getenv(name)
-    if valueStr == "" {
-        return defaultValue
-    }
-    value, err := strconv.Atoi(valueStr)
-    if err != nil {
-        log.Printf("Invalid value for %s: %s. Using default: %d\n", name, valueStr, defaultValue)
-        return defaultValue
-    }
-    return value
+	valueStr := os.Getenv(name)
+	if valueStr == "" {
+		return defaultValue
+	}
+	value, err := strconv.Atoi(valueStr)
+	if err != nil {
+		log.Printf("Invalid value for %s: %s. Using default: %d\n", name, valueStr, defaultValue)
+		return defaultValue
+	}
+	return value
 }
 
 // tokenize разбивает строку выражения на токены (числа и операторы).

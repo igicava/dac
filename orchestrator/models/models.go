@@ -12,11 +12,17 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var Tasks = make(chan Task)                // Канал с тасками
-var Results = make(map[string]chan Result) // Канал с результатами
-var Mu sync.Mutex                          // Мьютекс
-var DB *sql.DB                             // Для доступа к БД
-const SUPERSECRET = "gopher1234"           // Секретные сведения :)
+var Tasks = make(chan Task)             // Канал с тасками
+var Results = make(map[Key]chan Result) // Канал с результатами
+var Mu sync.Mutex                       // Мьютекс
+var DB *sql.DB                          // Для доступа к БД
+const SUPERSECRET = "gopher1234"        // Секретные сведения :)
+
+// Ключ доступа к каналу в мапе
+type Key struct {
+	Name string
+	ID   string
+}
 
 // Структура самого выражения
 type Expression struct {
@@ -34,6 +40,7 @@ type Task struct {
 	Arg2          float64 `json:"arg2"`
 	Operation     string  `json:"operation"`
 	OperationTime int     `json:"operation_time"`
+	Name          string  `json:"name"`
 }
 
 // Для вывода
@@ -65,12 +72,13 @@ type UserModel struct {
 type Result struct {
 	ID     string  `json:"id"`
 	Result float64 `json:"result"`
+	Name   string  `json:"name"`
 }
 
 // Новый канал для выражения
-func NewChan(id string) {
+func NewChan(id string, name string) {
 	Mu.Lock()
-	Results[id] = make(chan Result)
+	Results[Key{Name: name, ID: id}] = make(chan Result)
 	Mu.Unlock()
 }
 

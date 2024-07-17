@@ -17,11 +17,7 @@ func AddExpression(w http.ResponseWriter, r *http.Request) {
         http.Error(w, err.Error(), http.StatusUnprocessableEntity)
         return
     }
-    _, ok := models.Results[expr.ID]
-    if ok {
-        w.Write([]byte("Your id is already occupied by another user. Come up with another one or wait for it to be released\n"))
-        return
-    }
+    
     expr.Status = "pending"
 
     models.Mu.Lock()
@@ -37,7 +33,7 @@ func AddExpression(w http.ResponseWriter, r *http.Request) {
 
     models.Mu.Unlock()
 
-    go app.ProcessExpression(expr)
+    go app.ProcessExpression(expr, name)
 
     w.WriteHeader(http.StatusCreated)
 }
@@ -132,7 +128,7 @@ func RegisterNewUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-// Вход для пользователей
+// Вход для пользователей и выдача JWT токена
 func LoginUser(w http.ResponseWriter, r *http.Request) {
     var user models.UserModel
     if err := json.NewDecoder(r.Body).Decode(&user); err != nil {

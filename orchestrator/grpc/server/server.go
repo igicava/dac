@@ -9,14 +9,17 @@ import (
 	pb "dac/proto"
 )
 
+// gRPC сервер
 type Server struct {
 	pb.CalcServiceServer
 }
 
+// Создание gRPC сервера
 func NewServer() *Server {
 	return &Server{}
 }
 
+// Отдаёт таски агентам
 func (s *Server) GETtask(ctx context.Context, in *pb.GETRequest) (*pb.GETResponse, error) {
 	task := <-models.Tasks
 	byteTask, err := json.Marshal(task)
@@ -28,10 +31,12 @@ func (s *Server) GETtask(ctx context.Context, in *pb.GETRequest) (*pb.GETRespons
 	}, nil
 }
 
+// Принимает результаты от агентов 
 func (s *Server) POSTtask(ctx context.Context, in *pb.POSTRequest) (*pb.POSTResponse, error) {
 	var taskResult struct {
 		ID     string  `json:"id"`
 		Result float64 `json:"result"`
+		Name   string  `json:"name"`
 	}
 
 	err := json.Unmarshal([]byte(in.JsonTASK), &taskResult)
@@ -39,7 +44,7 @@ func (s *Server) POSTtask(ctx context.Context, in *pb.POSTRequest) (*pb.POSTResp
 		log.Println("Error Unmarshaling JSON")
 	}
 
-	models.Results[taskResult.ID] <- taskResult
+	models.Results[models.Key{Name: taskResult.Name, ID: taskResult.ID}] <- taskResult
 
 	models.Mu.Lock()
 	defer models.Mu.Unlock()

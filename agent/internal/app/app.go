@@ -19,6 +19,7 @@ type Task struct {
 	Arg2          float64 `json:"arg2"`
 	Operation     string  `json:"operation"`
 	OperationTime int     `json:"operation_time"`
+	Name          string  `json:"name"`
 }
 
 // Этот бро получает выражения
@@ -67,13 +68,15 @@ func ComputeTask(task Task) float64 {
 }
 
 // А этот бро отправляет результат оркестратору
-func SendResult(id string, result float64) {
+func SendResult(id string, result float64, name string) {
 	taskResult := struct {
 		ID     string  `json:"id"`
 		Result float64 `json:"result"`
+		Name   string  `json:"name"`
 	}{
 		ID:     id,
 		Result: result,
+		Name:   name,
 	}
 
 	jsonData, err := json.Marshal(taskResult)

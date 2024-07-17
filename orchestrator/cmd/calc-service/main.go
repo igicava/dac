@@ -29,7 +29,6 @@ func main() {
 		fmt.Println("DB is start")
 	}()
 
-	fmt.Println("gRPC server runing...")
 	host := "0.0.0.0"
 	port := "8081"
 
@@ -41,7 +40,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	log.Println("tcp listener started at port: ", port)
+	fmt.Println("grpc server started at port: ", port)
 	// создадим сервер grpc
 	grpcServer := grpc.NewServer()
 	// объект структуры, которая содержит реализацию
